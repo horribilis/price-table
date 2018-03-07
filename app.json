@@ -1,0 +1,9 @@
+{
+    "name": "Flask Heroku image generator",
+    "description": "car image generator",
+    "keywords": [
+      "flask",
+      "python"
+    ],
+    "repository": "https://github.com/horribilis/imago-generantis",
+  }
