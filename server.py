@@ -12,8 +12,10 @@ from flask import Flask
 app = Flask(__name__)
 
 
-@app.route('/price/<string:uid>/<string:content>')
-def price(uid,content):
+@app.route('/price')
+def price():
+    uid = request.args.get('case')
+    content = request.args.get('content')
     return uid + "||" + content
     # labelc = ['Part', 'Damaged-Level', 'Price']
     # chars = []
