@@ -16,7 +16,8 @@ app = Flask(__name__)
 def price():
     uid = str(request.args.get('case'))
     content = str(request.args.get('content'))
-    return uid + "||" + content
+    return send_file('app.json')
+    # return uid + "||" + content
     # labelc = ['Part', 'Damaged-Level', 'Price']
     # chars = []
     # ivaa_case = uid
