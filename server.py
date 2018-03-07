@@ -66,7 +66,9 @@ def price(uid,content):
                 cellLoc='center',
                 loc='upper left')
     print("ccc")
-    price = 1000
+    price = 0
+    for i in range(len(df.index)):
+        price = price + float(df.iloc[i][2])
     plt.text(0.3, 0.05, 'Estimated Total price is '+str(price)+' Bath.',fontsize=15)
     plt.axis('off')
     plt.savefig('res/'+ivaa_case+'.png')
