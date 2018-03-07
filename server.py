@@ -22,7 +22,7 @@ app = Flask(__name__)
 
 @app.route('/price/<string:uid>/<string:content>')
 def price(uid,content):
-    return uid
+    return uid + "||" + content
     # labelc = ['Part', 'Damaged-Level', 'Price']
     # chars = []
     # ivaa_case = uid
