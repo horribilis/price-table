@@ -14,8 +14,8 @@ app = Flask(__name__)
 
 @app.route('/price')
 def price():
-    uid = request.args.get('case')
-    content = request.args.get('content')
+    uid = str(request.args.get('case'))
+    content = str(request.args.get('content'))
     return uid + "||" + content
     # labelc = ['Part', 'Damaged-Level', 'Price']
     # chars = []
