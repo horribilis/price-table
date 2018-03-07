@@ -8,6 +8,8 @@ verify_ssl = true
 
 flask = "*"
 Pillow = "*"
+pandas = "*"
+matplotlib = "*"
 
 [requires]
 
