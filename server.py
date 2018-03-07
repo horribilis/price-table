@@ -1,105 +1,83 @@
 import os
 from os import listdir
 from os.path import isfile, join
-
 import time
 from PIL import Image
 from flask import send_file, request, app
-
+import sys
+import os
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib.ft2font import FT2Font
+from matplotlib.font_manager import FontProperties
+import matplotlib.pyplot as plt
+import six
+import pandas as pd
+from six import unichr
 from flask import Flask
+from flask import request
+
 app = Flask(__name__)
 
 
-def gen_name(images):
-    name = ""
-    for part in PART_ONLY:
-        if any(part in s for s in images if
-               part == s.replace('-low', '').replace('-medium', '').replace('-high', '').replace('-replace', '')):
-            full_part = [s for s in images if
-                         part == s.replace('-low', '').replace('-medium', '').replace('-high', '').replace('-replace',
-                                                                                                           '')]
-            if len(full_part) > 1:
-                # print(full_part)
-                return 'same'
-            if 'low' in full_part[0]:
-                name += str(1)
-            elif 'medium' in full_part[0]:
-                name += str(2)
-            elif 'high' in full_part[0]:
-                name += str(3)
-            elif 'replace' in full_part[0]:
-                name += str(4)
-            else:
-                return "?????????"
-        else:
-            name += str(0)
-    # print(name)
-    return name + '.jpg'
-
-
-def gen_image(path, parts, base_path, name):
-    size = 240, 240
-    background = Image.open(base_path)
-    for part in parts:
-        print(part)
-        foreground = Image.open(path + '/' + part + '.png')
-        background.paste(foreground, (0, 0), foreground)
-    # background.show()
-    background.thumbnail(size, Image.ANTIALIAS)
-    rgb_im = Image.new("RGB", background.size, (255, 255, 255))
-    rgb_im.paste(background, (0, 0), background)
-    rgb_im.save(name, "JPEG")
-    # base = cv2.imread("C:\\Users\\wit543\\horribilis\\exitum\\ivaa_frontend\\static\\car\\base\\back.png")
-    # img2 = cv2.imread(path + '/' + part + '.png')
-    # # I want to put logo on top-left corner, So I create a ROI
-    # rows, cols, channels = img2.shape
-    # roi = base[0:rows, 0:cols]
-    # # Now create a mask of logo and create its inverse mask also
-    # img2gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-    # ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
-    # mask_inv = cv2.bitwise_not(mask)
-    # # Now black-out the area of logo in ROI
-    # img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
-    # # Take only region of logo from logo image.
-    # img2_fg = cv2.bitwise_and(img2, img2, mask=mask)
-    # print(base.shape)
-    # dst = cv2.add(img1_bg,img2_fg)
-    # cv2.imshow('res', dst)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-
-
-def gen(parts, part_image_path, base_image_path, output_path):
-    onlyfiles = [f.split('.')[0] for f in listdir(part_image_path) if isfile(join(part_image_path, f))]
-    parts = [part for part in parts if part in onlyfiles]
-    name = gen_name(parts)
-    if name != 'same':
-        name = output_path + '/' + name
-        gen_image(part_image_path, parts, base_image_path, name)
-        return name
-    return None
-
-def gen_side(parts, side):
-    sides = ['front', 'back', 'left', 'right']
-    if side not in sides:
-        return
-    path = "./images/" + side
-    base_path = "./images/base/" + side + ".png"
-    output_path = "./images-out/" + side
-    name = gen(parts, path, base_path, output_path)
-    if not name:
-        return base_path
-    return name
-
-
-@app.route('/get_image')
-def get_image():
-    parts = str(request.args.get('parts')).split(',')
-    side = request.args.get('side')
-    if not side:
-        return
-    filename = gen_side(parts, side)
-    return send_file(filename, mimetype='image/jpg')
+@app.route('/price/<string:uid>/<string:content>')
+def price(uid,content):
+    labelc = ['Part', 'Damaged-Level', 'Price']
+    chars = []
+    ivaa_case = uid
+    print(ivaa_case)
+    rows = content.split(",,")
+    f = open("res/"+uid+".csv","w")
+    if len(rows)==2 and content.split(",,")[1]=='':
+        a = str(content.split(",,")[0].split(",")[0])
+        b = str(content.split(",,")[0].split(",")[1])
+        c = str(content.split(",,")[0].split(",")[2])
+        f.write(a+","+b+","+c+"\n")
+    else:
+        for i in rows:
+            a = str(i.split(",")[0])
+            b = str(i.split(",")[1])
+            c = str(i.split(",")[2])
+            print(a)
+            f.write(a+","+b+","+c+"\n")
+    f.close()
+    df = pd.read_csv("res/"+uid+".csv",header=None)
+    for i in range(len(df.index)):
+        print(type(df.iloc[i]))
+        chars.append(df.iloc[i])
+    print(chars)
+    labelr = []
+    for i in range(len(df.index)):
+        labelr.append(" "+str(i+1))
+    colors = [[(0.95, 0.95, 0.95) for c in range(3)] for r in range(len(df.index))]
+    print("aaa")
+    plt.title('CASE-ID : '+ivaa_case)
+    print("bbb")
+    print(chars)
+    print(labelr)
+    print(labelc)
+    print(colors)
+    plt.table(cellText=chars,
+                rowLabels=labelr,
+                colLabels=labelc,
+                rowColours=[(1,1,1)] * len(df.index),
+                colColours=[(0.5,0.5,1)] * 3,
+                cellColours=colors,
+                cellLoc='center',
+                loc='upper left')
+    print("ccc")
+    price = 1000
+    plt.text(0.3, 0.05, 'Estimated Total price is '+str(price)+' Bath.',fontsize=15)
+    plt.axis('off')
+    plt.savefig('res/'+ivaa_case+'.png')
+    print("zzzz")
+    return send_file('res/'+ivaa_case+'.png', mimetype='image/jpg')
+    # parts = str(request.args.get('parts')).split(',')
+    # side = request.args.get('side')
+    # if not side:
+    #     return
+    # filename = gen_side(parts, side)
+    # return send_file(filename, mimetype='image/jpg')
 
 
 if __name__ == "__main__":
