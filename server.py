@@ -6,16 +6,16 @@ from PIL import Image
 from flask import send_file, request, app
 import sys
 import os
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib.ft2font import FT2Font
-from matplotlib.font_manager import FontProperties
-import matplotlib.pyplot as plt
-import six
-import pandas as pd
-from six import unichr
-from flask import Flask
-from flask import request
+# import matplotlib
+# matplotlib.use('Agg')
+# from matplotlib.ft2font import FT2Font
+# from matplotlib.font_manager import FontProperties
+# import matplotlib.pyplot as plt
+# import six
+# import pandas as pd
+# from six import unichr
+# from flask import Flask
+# from flask import request
 
 app = Flask(__name__)
 
